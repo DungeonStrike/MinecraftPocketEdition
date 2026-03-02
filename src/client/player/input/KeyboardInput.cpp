@@ -52,7 +52,7 @@ void KeyboardInput::tick( Player* player )
 		ya *= 0.3f;
 	}
 
-	#ifdef PLATFORM_DESKTOP
+	#ifdef RPI
 		wantUp = jumping;
 		wantDown = sneaking;
 	#endif

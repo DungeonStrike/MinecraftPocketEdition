@@ -23,18 +23,18 @@
     /*public*/ static const int C = 2; // The Z value of the plane's normal
     /*public*/ static const int D = 3; // The distance the plane is from the origin
 
-    /*public*/ float** m_Frustum; // =  /*new*/ float[16][16];
-    /*public*/ float* proj; // = /*new*/ float[16];
-    /*public*/ float* modl; // = /*new*/ float[16];
-    /*public*/ float* clip; // = /*new*/ float[16];
+    /*public*/ float[][] m_Frustum = /*new*/ float[16][16];
+    /*public*/ float[] proj = /*new*/ float[16];
+    /*public*/ float[] modl = /*new*/ float[16];
+    /*public*/ float[] clip = /*new*/ float[16];
 /*
-    /*public*/ FrustumData(float** mFrustum, float* proj, float* modl, float* clip)
+    /*public*/ FrustumData(float[][] mFrustum, float[] proj, float[] modl, float[] clip)
     {
         m_Frustum = mFrustum;
         this->proj = proj;
         this->modl = modl;
         this->clip = clip;
-    }
+    }*/
     /*public*/ bool pointInFrustum(float x, float y, float z)
     {
         for (int i = 0; i < 6; i++)

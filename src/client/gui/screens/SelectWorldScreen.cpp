@@ -295,7 +295,7 @@ static char ILLEGAL_FILE_CHARACTERS[] = {
 void SelectWorldScreen::tick()
 {
 	if (_state == _STATE_CREATEWORLD) {
-		#if defined(PLATFORM_DESKTOP)
+		#if defined(RPI)
 			std::string levelId = getUniqueLevelName("world");
 			LevelSettings settings(getEpochTimeS(), GameType::Creative);
 			minecraft->selectLevel(levelId, levelId, settings);

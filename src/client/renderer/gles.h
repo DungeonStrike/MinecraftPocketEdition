@@ -5,7 +5,7 @@
 #include "../Options.h"
 
 // Android should always run OPENGL_ES
-#if defined(ANDROID) || defined(__APPLE__) || defined(PLATFORM_DESKTOP)
+#if defined(ANDROID) || defined(__APPLE__) || defined(RPI)
     #define OPENGL_ES
 #endif
 
@@ -17,9 +17,7 @@
         #import <OpenGLES/ES1/gl.height>
         #import <OpenGLES/ES1/glext.height>
     #else
-        // #include <GLES/gl.h>
-		#include <glad/glad.h>
-		
+        #include <glad/glad.h>
         #if defined(ANDROID)
             #include<GLES/glext.h>
         #endif
@@ -30,12 +28,13 @@
 	   #include <WinSock2.h>
 	   #include <Windows.h>
 	#endif
-	// #include <gl/glew.h>
-	// #include <gl/GL.h>
+	#include <gl/glew.h>
+	#include <gl/GL.h>
 
 	#define glFogx(a,b)	glFogi(a,b)
 	#define glOrthof(a,b,c,d,e,f) glOrtho(a,b,c,d,e,f)
 #endif
+
 
 #define GLERRDEBUG 1
 #if GLERRDEBUG

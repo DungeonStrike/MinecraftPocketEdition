@@ -112,10 +112,10 @@ void Gui::render(float a, bool mouseFree, int xMouse, int yMouse) {
 	unsigned int max = 10;
     bool isChatting = false;
 	renderChatMessages(screenHeight, max, isChatting, font);
-#ifndef PLATFORM_DESKTOP
+#if !defined(RPI)
 	renderOnSelectItemNameText(screenWidth, font, ySlot);
 #endif
-#ifdef PLATFORM_DESKTOP
+#if defined(RPI)
 	renderDebugInfo();
 #endif
 

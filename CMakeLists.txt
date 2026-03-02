@@ -5,7 +5,7 @@ include(cmake/CPM.cmake)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-set(CMAKE_CXX_FLAGS "-Wno-c++11-narrowing -Wno-invalid-source-encoding")
+set(CMAKE_CXX_FLAGS "-Wno-c++11-narrowing -Wno-invalid-source-encoding -Wno-reserved-user-defined-literal")
 
 CPMAddPackage("gh:madler/zlib@1.3.2")
 CPMAddPackage(

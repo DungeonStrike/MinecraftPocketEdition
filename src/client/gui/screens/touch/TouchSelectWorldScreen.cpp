@@ -393,7 +393,7 @@ static char ILLEGAL_FILE_CHARACTERS[] = {
 void SelectWorldScreen::tick()
 {
 	if (_state == _STATE_CREATEWORLD) {
-		#ifdef PLATFORM_DESKTOP
+		#if defined(RPI)
 			std::string levelId = getUniqueLevelName("perf");
 			//int seed = Util::hashCode("/r/Minecraft");
 			LevelSettings settings(getEpochTimeS(), GameType::Creative);

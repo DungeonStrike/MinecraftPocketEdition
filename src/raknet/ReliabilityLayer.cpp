@@ -1361,7 +1361,7 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 #ifdef PRINT_TO_FILE_ROT
 						if (fp)
 						{
-						fprintf(fp, "Heap push %i, %s, weight=%llu. OI=%i. waiting on %i. SI=%i.\n", receivedPacketNumber, type, weight, internalPacket->orderingIndex.val, orderedReadIndex[internalPacket->orderingChannel].val, internalPacket->sequencingIndex);
+						fprintf(fp, "Heap push %i, %s, weight=%"PRINTF_64_BIT_MODIFIER"u. OI=%i. waiting on %i. SI=%i.\n", receivedPacketNumber, type, weight, internalPacket->orderingIndex.val, orderedReadIndex[internalPacket->orderingChannel].val, internalPacket->sequencingIndex);
 						fflush(fp);
 						}
 #endif
