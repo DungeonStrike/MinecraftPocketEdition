@@ -715,7 +715,7 @@ void Minecraft::tickInput() {
 					#endif
 				}
 			#endif
-			#if defined(RPI)
+			#if defined(PLATFORM_DESKTOP)
 				if (key == Keyboard::KEY_E) {
 					screenChooser.setScreen(SCREEN_BLOCKSELECTION);
 				}
@@ -831,7 +831,7 @@ void Minecraft::tickInput() {
 				}
 			#endif
 
-			#ifndef RPI
+			#ifndef PLATFORM_DESKTOP
 				if (key == 82)
 					pauseGame(false);
 			#else
@@ -1242,7 +1242,7 @@ void Minecraft::_reloadInput() {
 #ifndef STANDALONE_SERVER
 	delete inputHolder;
 
-	if (useTouchscreen()) {
+	if (useTouchscreen() && !PLATFORM_DESKTOP) {
 		inputHolder = new TouchInputHolder(this, &options);
 	} else {
 		#if defined(ANDROID) || defined(__APPLE__) 

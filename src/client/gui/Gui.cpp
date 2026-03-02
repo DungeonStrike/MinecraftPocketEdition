@@ -66,7 +66,11 @@ void Gui::render(float a, bool mouseFree, int xMouse, int yMouse) {
 	//minecraft->gameRenderer->setupGuiScreen();
 	Font* font = minecraft->font;
 
+#ifdef PLATFORM_DESKTOP
+	const bool isTouchInterface = false;
+#else
 	const bool isTouchInterface = minecraft->useTouchscreen();
+#endif
 	const int screenWidth = (int)(minecraft->width * InvGuiScale);
 	const int screenHeight = (int)(minecraft->height * InvGuiScale);
 	blitOffset = -90;
@@ -391,7 +395,6 @@ void Gui::onConfigChanged( const Config& c ) {
 		//LOGI("x,y: %f, %f\n", xx, yy);
 	}
 	rcFeedbackInner = t.end(true, rcFeedbackInner.vboId);
-
 	if (c.minecraft->useTouchscreen()) {
 		// I'll bump this up to 6.
 		int num = 6; // without "..." dots

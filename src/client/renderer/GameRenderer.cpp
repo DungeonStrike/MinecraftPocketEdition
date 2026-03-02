@@ -152,7 +152,8 @@ void GameRenderer::render(float a) {
 
 	int xMouse = (int)(Mouse::getX() * Gui::InvGuiScale);
 	int yMouse = (int)(Mouse::getY() * Gui::InvGuiScale);
-	if (mc->useTouchscreen()) {
+#ifndef PLATFORM_DESKTOP
+    if (mc->useTouchscreen()) {
 		const int pid = Multitouch::getFirstActivePointerIdExThisUpdate();
 		if (pid >= 0) {
 			xMouse = (int)(Multitouch::getX(pid) * Gui::InvGuiScale);
@@ -162,6 +163,7 @@ void GameRenderer::render(float a) {
 			yMouse = -9999;
 		}
 	}
+#endif
 	TIMER_POP();
 
 	bool hasClearedColorBuffer = false;
@@ -652,8 +654,11 @@ void GameRenderer::pick(float a) {
 
     float range = mc->gameMode->getPickRange();
     bool isPicking = true;
-
+#ifndef PLATFORM_DESKTOP
     bool freeform = mc->useTouchscreen()  && !mc->options.isJoyTouchArea;
+#else 
+    bool freeform = false;
+#endif
     if (freeform) {
         isPicking = updateFreeformPickDirection(a, pickDirection);
     } else {

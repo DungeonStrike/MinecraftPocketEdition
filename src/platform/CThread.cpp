@@ -25,12 +25,12 @@
 			&m_threadID        // pointer to receive thread ID
 		);
 	#endif
-	#if defined(LINUX) || defined(ANDROID) || defined(__APPLE__) || defined(POSIX)
+	#if defined(__linux__) || defined(ANDROID) || defined(__APPLE__) || defined(POSIX)
 		mp_threadFunc = (pthread_fn)threadFunc;
 
 		pthread_attr_init(&m_attributes);
 		pthread_attr_setdetachstate( &m_attributes, PTHREAD_CREATE_DETACHED );
-		/*int error =*/ pthread_create(&m_thread, &m_attributes, mp_threadFunc,threadParam);
+		/*int error =*/ pthread_create(&m_thread, &m_attributes, mp_threadFunc, threadParam);
 	#endif
 	#ifdef MACOSX
 		mp_threadFunc = (TaskProc) threadFunc;

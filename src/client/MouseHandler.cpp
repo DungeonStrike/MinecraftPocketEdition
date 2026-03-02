@@ -5,6 +5,10 @@
 #include <SDL/SDL.h>
 #endif
 
+#ifdef PLATFORM_GLFW
+#include <GLFW/glfw3.h>
+#endif
+
 MouseHandler::MouseHandler( ITurnInput* turnInput )
 :	_turnInput(turnInput)
 {}
@@ -29,6 +33,10 @@ void MouseHandler::grab() {
 	SDL_WM_GrabInput(SDL_GRAB_ON);
 	SDL_ShowCursor(0);
 #endif
+
+#ifdef PLATFORM_GLFW
+	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#endif
 }
 
 void MouseHandler::release() {
@@ -36,6 +44,10 @@ void MouseHandler::release() {
 	//LOGI("Releasing input!\n");
 	SDL_WM_GrabInput(SDL_GRAB_OFF);
 	SDL_ShowCursor(1);
+#endif
+
+#ifdef PLATFORM_GLFW
+	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 #endif
 }
 

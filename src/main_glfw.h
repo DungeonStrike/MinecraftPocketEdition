@@ -60,6 +60,8 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+	if(action == GLFW_REPEAT) return;
+
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 
