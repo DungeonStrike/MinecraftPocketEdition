@@ -4,7 +4,7 @@
     #define NO_NETWORK
 #endif
 
-#if defined(RPI)
+#ifdef PLATFORM_DESKTOP
 	#define CREATORMODE
 #endif
 
@@ -574,7 +574,7 @@ void Minecraft::tick(int nTick, int maxTick) {
 #ifndef STANDALONE_SERVER
 	textures->loadAndBindTexture("terrain.png");
 	if (!pause && !(screen && !screen->renderGameBehind())) {
-		#if !defined(RPI)
+		#ifndef PLATFORM_DESKTOP
 			#ifdef __APPLE__
 			if (isSuperFast())
 			#endif
@@ -691,7 +691,7 @@ void Minecraft::tickInput() {
 		if (isPressed) {
 			gui.handleKeyPressed(key);
 
-			#if defined(WIN32) || defined(RPI)//|| defined(_DEBUG) || defined(DEBUG)
+			#ifdef PLATFORM_DESKTOP //|| defined(_DEBUG) || defined(DEBUG)
 				if (key >= '0' && key <= '9') {
 					int digit = key - '0';
 					int slot = digit - 1;
@@ -714,16 +714,14 @@ void Minecraft::tickInput() {
 						}
 					#endif
 				}
-			#endif
-			#if defined(RPI)
+
 				if (key == Keyboard::KEY_E) {
 					screenChooser.setScreen(SCREEN_BLOCKSELECTION);
 				}
 				if (!screen && key == Keyboard::KEY_O || key == 250) {
 					releaseMouse();
 				}
-			#endif
-			#if defined(WIN32)
+
 				if (key == Keyboard::KEY_F) {
 					options.isFlying = !options.isFlying;
 					player->noPhysics = options.isFlying;
@@ -831,7 +829,7 @@ void Minecraft::tickInput() {
 				}
 			#endif
 
-			#if !defined(RPI) && !defined(PLATFORM_GLFW)
+			#ifndef PLATFORM_DESKTOP
 				if (key == 82)
 					pauseGame(false);
 			#else
@@ -848,7 +846,7 @@ void Minecraft::tickInput() {
 				}
 			#endif
 		}
-		#ifdef WIN32
+		#ifdef PLATFORM_DESKTOP
 			if (key == Keyboard::KEY_M) {
 				for (int i = 0; i < 5 * SharedConstants::TicksPerSecond; ++i)
 					level->tick();
@@ -892,7 +890,7 @@ void Minecraft::tickInput() {
 		||	(buildHandled && bai.isRemove());
 
 	TIMER_POP_PUSH("handlemouse");
-#if defined(RPI) || defined(PLATFORM_GLFW)
+#ifdef PLATFORM_DESKTOP
 	handleMouseDown(MouseAction::ACTION_LEFT, isTryingToDestroyBlock);
 	handleMouseClick(buildHandled && bai.isInteract()
 		|| options.useMouseForDigging && Mouse::isButtonDown(MouseAction::ACTION_RIGHT));
@@ -1123,7 +1121,7 @@ void Minecraft::releaseMouse()
 }
 
 bool Minecraft::useTouchscreen() {
-#if defined(RPI) || defined(PLATFORM_GLFW)
+#ifdef PLATFORM_DESKTOP
 	return false;
 #endif
 	return options.useTouchScreen || !_supportsNonTouchscreen;
@@ -1366,7 +1364,7 @@ void Minecraft::_levelGenerated()
 		netCallback->levelGenerated(level);
 	}
 
-#if defined(WIN32) || defined(RPI)
+#ifdef PLATFORM_DESKTOP
 	if (_commandServer) {
 		delete _commandServer;
 	}

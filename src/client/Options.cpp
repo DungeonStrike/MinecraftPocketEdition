@@ -54,7 +54,7 @@ void Options::initDefaultValues() {
 	keyJump  = KeyMapping("key.jump", Keyboard::KEY_SPACE);
 	keyBuild = KeyMapping("key.inventory", Keyboard::KEY_E);
 	keySneak = KeyMapping("key.sneak", Keyboard::KEY_LSHIFT);
-#if defined(RPI) || defined(PLATFORM_GLFW)
+#ifdef PLATFORM_DESKTOP
 	keyCraft = KeyMapping("key.crafting", Keyboard::KEY_Q);
 	keyDrop  = KeyMapping("key.drop", Keyboard::KEY_Q);
 	keyChat  = KeyMapping("key.chat", Keyboard::KEY_T);

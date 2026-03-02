@@ -8,6 +8,7 @@
 
 /*static*/ int  Textures::textureChanges = 0;
 /*static*/ bool Textures::MIPMAP = false;
+const TextureId Textures::InvalidId = -1;
 
 Textures::Textures( Options* options_, AppPlatform* platform_ )
 :	clamp(false),

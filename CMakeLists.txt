@@ -3,6 +3,10 @@ project(MinecraftPE)
 
 include(cmake/CPM.cmake)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_FLAGS "-Wno-c++11-narrowing -Wno-invalid-source-encoding")
+
 CPMAddPackage("gh:madler/zlib@1.3.2")
 CPMAddPackage(
     NAME "libpng"
@@ -116,14 +120,32 @@ file(GLOB SOURCES
     "src/NinecraftApp.cpp"
 )
 
+if(NOT DEFINED PLATFORM)
+    set(PLATFORM "PLATFORM_GLFW")
+endif()
+
+
+if(PLATFORM STREQUAL "PLATFORM_WIN32")
+    list(APPEND SOURCES "src/AppPlatform_win32.cpp")
+endif()
+
+if(PLATFORM STREQUAL "PLATFORM_GLFW")
+    list(APPEND SOURCES "src/AppPlatform_glfw.cpp")
+endif()
+
 add_executable(${PROJECT_NAME} 
     ${SOURCES}
-
-    #TODO: if PLATFORM=PLATFORM_GLFW
-    "src/AppPlatform_glfw.cpp"
-
     "glad/src/glad.c"
 )
+
+if(WIN32)
+    set(EXTRA_LIBS "ws2_32")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC "_CRT_SECURE_NO_WARNINGS")
+endif()
+
+if(PLATFORM STREQUAL "PLATFORM_WIN32" OR PLATFORM STREQUAL "PLATFORM_GLFW")
+    target_compile_definitions(${PROJECT_NAME} PUBLIC "PLATFORM_DESKTOP")
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     "${CMAKE_SOURCE_DIR}/glad/include/"
@@ -133,14 +155,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "lib/include"
 )
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC "OPENGL_ES" "NO_EGL" "_CRT_SECURE_NO_WARNINGS" "PLATFORM_GLFW")
+target_compile_definitions(${PROJECT_NAME} PUBLIC "OPENGL_ES" "NO_EGL" ${PLATFORM})
+target_link_libraries(${PROJECT_NAME} zlib png_shared alsoft.common OpenAL::OpenAL glfw ${EXTRA_LIBS})
 
-# TODO: add ws2_32 lib if windows
-# TODO: fix openal linking for windows
-
-target_link_libraries(${PROJECT_NAME} zlib png_shared alsoft.common OpenAL glfw)
-
-if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if (NOT UNIX)
 add_custom_command(
     TARGET ${PROJECT_NAME} 
     POST_BUILD
