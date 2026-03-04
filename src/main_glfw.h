@@ -1,6 +1,7 @@
 #ifndef MAIN_GLFW_H__
 #define MAIN_GLFW_H__
 
+#include "GLFW/glfw3.h"
 #include "client/renderer/gles.h"
 #include "SharedConstants.h"
 
@@ -103,6 +104,7 @@ int main(void) {
 		return 1;
 	}
 
+	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -124,6 +126,7 @@ int main(void) {
 	gladLoadGLES1Loader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(1);
 #endif
+
 	App* app = new MAIN_CLASS();
 
 	g_app = app;

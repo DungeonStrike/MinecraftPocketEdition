@@ -1,4 +1,5 @@
 #include "Minecraft.h"
+#include "client/player/input/IBuildInput.h"
 
 #if defined(APPLE_DEMO_PROMOTION)
     #define NO_NETWORK
@@ -854,51 +855,29 @@ void Minecraft::tickInput() {
 					level->tick();
 			}
 		#endif
-
-
-		//if (!isPressed) LOGI("Key released: %d\n", key);
-
-		if (!options.useMouseForDigging) {
-			int passedTime = getTimeMs() - lastTickTime;
-			if (passedTime > 200) continue;
-
-			// Destroy and attack is on same button
-			if (key == options.keyDestroy.key && isPressed) {
-				BuildActionIntention bai(BuildActionIntention::BAI_REMOVE | BuildActionIntention::BAI_ATTACK);
-				handleBuildAction(&bai);
-			}
-			else // Build and use/interact is on same button
-			if (key == options.keyUse.key && isPressed) {
-				BuildActionIntention bai(BuildActionIntention::BAI_BUILD | BuildActionIntention::BAI_INTERACT);
-				handleBuildAction(&bai);
-			}
-		}
 	}
-
-	TIMER_POP_PUSH("tickbuild");
-	BuildActionIntention bai;
-	// @note: This might be a problem. This method is polling based here, but
-	//        event based when using mouse (or keys..), and in java. Not quite
-	//        sure just yet what way to go.
-	bool buildHandled = inputHolder->getBuildInput()->tickBuild(player, &bai);
-	if (buildHandled) {
-		if (!bai.isRemoveContinue())
-			handleBuildAction(&bai);
-	}
-
-	bool isTryingToDestroyBlock = (options.useMouseForDigging
-			?	(Mouse::isButtonDown(MouseAction::ACTION_LEFT) && mouseDiggable)
-			:	Keyboard::isKeyDown(options.keyDestroy.key))
-		||	(buildHandled && bai.isRemove());
 
 	TIMER_POP_PUSH("handlemouse");
-#ifdef RPI
-	handleMouseDown(MouseAction::ACTION_LEFT, isTryingToDestroyBlock);
-	handleMouseClick(buildHandled && bai.isInteract()
-		|| options.useMouseForDigging && Mouse::isButtonDown(MouseAction::ACTION_RIGHT));
-#else
-	handleMouseDown(MouseAction::ACTION_LEFT, isTryingToDestroyBlock || (buildHandled && bai.isInteract()));
-#endif
+	
+	static bool prevMouseDownLeft = false;
+
+	// Destroy and attack is on same button
+	if (Mouse::isButtonDown(MouseAction::ACTION_LEFT)) {
+		auto baiFlags = BuildActionIntention::BAI_REMOVE | BuildActionIntention::BAI_ATTACK;
+
+		if (!prevMouseDownLeft) baiFlags |= BuildActionIntention::BAI_FIRSTREMOVE;
+
+		BuildActionIntention bai(baiFlags);
+		handleBuildAction(&bai);
+	}
+
+	prevMouseDownLeft = Mouse::isButtonDown(MouseAction::ACTION_LEFT);
+
+	// Build and use/interact is on same button
+	if (Mouse::isButtonDown(MouseAction::ACTION_RIGHT)) {
+		BuildActionIntention bai(BuildActionIntention::BAI_BUILD | BuildActionIntention::BAI_INTERACT);
+		handleBuildAction(&bai);
+	}
 
 	lastTickTime = getTimeMs();
 
@@ -912,42 +891,6 @@ void Minecraft::tickInput() {
 
 	TIMER_POP();
 #endif
-}
-
-void Minecraft::handleMouseDown(int button, bool down) {
-#ifndef STANDALONE_SERVER
-#ifndef RPI
-	if(player->isUsingItem()) {
-		if(!down && !Keyboard::isKeyDown(options.keyUse.key)) {
-			gameMode->releaseUsingItem(player);
-		}
-		return;
-	}
-#endif
-	if(player->isSleeping()) {
-		return;
-	}
-    if (button == MouseAction::ACTION_LEFT && missTime > 0) return;
-	if (down && hitResult.type == TILE && button == MouseAction::ACTION_LEFT && !hitResult.indirectHit) {
-        int x = hitResult.x;
-        int y = hitResult.y;
-        int z = hitResult.z;
-        gameMode->continueDestroyBlock(x, y, z, hitResult.f);
-        particleEngine->crack(x, y, z, hitResult.f);
-		player->swing();
-    } else {
-        gameMode->stopDestroyBlock();
-    }
-#endif
-}
-
-void Minecraft::handleMouseClick(int button) {
-//	BuildActionIntention bai(
-//		(button == MouseAction::ACTION_LEFT)?
-//			BuildActionIntention::BAI_REMOVE
-//		:	BuildActionIntention::BAI_BUILD);
-//
-//	handleBuildAction(&bai);
 }
 
 void Minecraft::handleBuildAction(BuildActionIntention* action) {
@@ -996,7 +939,15 @@ void Minecraft::handleBuildAction(BuildActionIntention* action) {
 
 			//LOGI("tile: %s - %d, %d, %d. b: %f - %f\n", oldTile->getDescriptionId().c_str(), x, y, z, oldTile->getBrightness(level, x, y, z), oldTile->getBrightness(level, x, y+1, z));
             level->extinguishFire(x, y, z, hitResult.f);
-			gameMode->startDestroyBlock(x, y, z, hitResult.f);
+			
+			if (action->isFirstRemove()) {
+				gameMode->startDestroyBlock(x, y, z, hitResult.f);
+			} else {
+				gameMode->continueDestroyBlock(x, y, z, hitResult.f);
+			}
+
+			particleEngine->crack(x, y, z, hitResult.f);
+			player->swing();
         }
 		else {
 			ItemInstance* item = player->inventory->getSelected();

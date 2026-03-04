@@ -131,9 +131,6 @@ protected:
 private:
 	static void* prepareLevel_tspawn(void *p_param);
 
-	void handleMouseClick(int button);
-	void handleMouseDown(int button, bool down);
-
 	void _reloadInput();
 public:
 	int width;
