@@ -1,5 +1,6 @@
 #include "Gui.h"
 #include "Font.h"
+#include "client/Options.h"
 #include "screens/IngameBlockSelectionScreen.h"
 #include "../Minecraft.h"
 #include "../player/LocalPlayer.h"
@@ -106,12 +107,6 @@ void Gui::render(float a, bool mouseFree, int xMouse, int yMouse) {
 
 	renderToolBar(a, ySlot, screenWidth);
 
-
-	//font->drawShadow(APP_NAME, 2, 2, 0xffffffff);
-	//font->drawShadow("This is a demo, not the finished product", 2, 10 + 2, 0xffffffff);
-	#ifdef APPLE_DEMO_PROMOTION
-		font->drawShadow("Demo version", 2, 0 + 2, 0xffffffff);
-	#endif /*APPLE_DEMO_PROMOTION*/
 	glEnable(GL_BLEND);
 	unsigned int max = 10;
     bool isChatting = false;
@@ -123,9 +118,6 @@ void Gui::render(float a, bool mouseFree, int xMouse, int yMouse) {
 	renderDebugInfo();
 #endif
 
-//        glPopMatrix2();
-//
-//        glEnable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
 	glEnable2(GL_ALPHA_TEST);
 }
@@ -188,11 +180,13 @@ void Gui::handleClick(int button, int x, int y) {
 	int slot = getSlotIdAt(x, y);
 	if (slot != -1)
 	{
+#ifndef PLATFORM_DESKTOP
 		if (slot == (getNumSlots()-1))
 		{
 			minecraft->screenChooser.setScreen(SCREEN_BLOCKSELECTION);
 		}
 		else
+#endif
 		{
 			minecraft->player->inventory->selectSlot(slot);
 			itemNameOverlayTime = 0;
@@ -219,6 +213,10 @@ void Gui::handleKeyPressed(int key)
 	else if (key == 100)
 	{
 		minecraft->screenChooser.setScreen(SCREEN_BLOCKSELECTION);
+	}
+	else if (key == minecraft->options.keyDrop.key) 
+	{
+		minecraft->player->inventory->dropSlot(minecraft->player->inventory->selected, false);
 	}
 }
 
@@ -395,6 +393,7 @@ void Gui::onConfigChanged( const Config& c ) {
 		//LOGI("x,y: %f, %f\n", xx, yy);
 	}
 	rcFeedbackInner = t.end(true, rcFeedbackInner.vboId);
+
 	if (c.minecraft->useTouchscreen()) {
 		// I'll bump this up to 6.
 		int num = 6; // without "..." dots
@@ -452,9 +451,16 @@ void Gui::tickItemDrop()
 	// Handle item drop
 	static bool isCurrentlyActive = false;
 	isCurrentlyActive = false;
+
+	int slots = getNumSlots();
+
+#ifndef PLATFORM_DESKTOP
+	slots--;
+#endif
+
 	if (Mouse::isButtonDown(MouseAction::ACTION_LEFT)) {
 		int slot = getSlotIdAt(Mouse::getX(), Mouse::getY());
-		if (slot >= 0 && slot < getNumSlots()-1) {
+		if (slot >= 0 && slot < slots) {
 			if (slot != _currentDropSlot) {
 				_currentDropTicks = 0;
 				_currentDropSlot = slot;
@@ -756,20 +762,24 @@ void Gui::renderToolBar( float a, int ySlot, const int screenWidth ) {
 	t.beginOverride();
 
 	float x = baseItemX;
-	for (int i = 0; i < getNumSlots()-1; i++) {
+
+	int slots = getNumSlots();
+
+	// TODO: if using touchscreen
+
+#ifndef PLATFORM_DESKTOP
+	slots--;
+#endif
+
+	for (int i = 0; i < slots; i++) {
 		renderSlot(i, (int)x, ySlot, a);
 		x += 20;
 	}
 	_inventoryNeedsUpdate = false;
-	//_inventoryRc = t.end(_inventoryRc.vboId);
 
-	//drawArrayVTC(_inventoryRc.vboId, _inventoryRc.vertexCount);
-
-	//renderSlotWatch.stop();
-	//renderSlotWatch.printEvery(100, "Render slots:");
-
-	//int x = screenWidth / 2 + getNumSlots() * 10 + (getNumSlots()-1) * 20 + 2;
+#ifndef PLATFORM_DESKTOP
 	blit(screenWidth / 2 + 10 * getNumSlots() - 20 + 4, ySlot + 6, 242, 252, 14, 4, 14, 4);
+#endif
 
 	minecraft->textures->loadAndBindTexture("gui/gui_blocks.png");
 	t.endOverrideAndDraw();
@@ -779,7 +789,7 @@ void Gui::renderToolBar( float a, int ySlot, const int screenWidth ) {
 	glDisable2(GL_TEXTURE_2D);
 	t.beginOverride();
 	x = baseItemX;
-	for (int i = 0; i < getNumSlots()-1; i++) {
+	for (int i = 0; i < slots; i++) {
 		ItemRenderer::renderGuiItemDecorations(minecraft->player->inventory->getItem(i), x, (float)ySlot);
 		x += 20;
 	}
@@ -799,7 +809,7 @@ void Gui::renderToolBar( float a, int ySlot, const int screenWidth ) {
 	t.beginOverride();
 	if (minecraft->gameMode->isSurvivalType()) {
 		x = baseItemX;
-		for (int i = 0; i < getNumSlots()-1; i++) {
+		for (int i = 0; i < slots; i++) {
 			ItemInstance* item = minecraft->player->inventory->getItem(i);
 			if (item && item->count >= 0)
 				renderSlotText(item, k*x, k*ySlot + 1, true, true);

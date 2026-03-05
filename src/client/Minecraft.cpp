@@ -665,7 +665,12 @@ void Minecraft::tickInput() {
 
 		if (e.action == MouseAction::ACTION_WHEEL) {
 			Inventory* v = player->inventory;
-			int numSlots = gui.getNumSlots() - 1;
+
+			int numSlots = gui.getNumSlots();
+#ifndef PLATFORM_DESKTOP
+			numSlots--;
+#endif
+
 			int slot = (v->selected - e.dy + numSlots) % numSlots;
 			v->selectSlot(slot);
 		}
@@ -1266,7 +1271,7 @@ void Minecraft::hostMultiplayer(int port) {
 //
 /*static*/
 
-	void* Minecraft::prepareLevel_tspawn(void *p_param)
+void* Minecraft::prepareLevel_tspawn(void *p_param)
 {
 	Minecraft* mc = (Minecraft*) p_param;
 	mc->generateLevel("Currently not used", mc->level);

@@ -1248,7 +1248,7 @@ int SocketLayer::SendTo_PC( SOCKET s, const char *data, int length, const System
 #ifdef DEBUG_SENDTO_SPIKES
 		RakNetTime end = RakNet::GetTime();
 		static unsigned int callCount=1;
-		RAKNET_DEBUG_PRINTF("%i. SendTo_PC, time=%"PRINTF_64_BIT_MODIFIER"u, elapsed=%"PRINTF_64_BIT_MODIFIER"u, length=%i, returned=%i, binaryAddress=%i, port=%i, file=%s, line=%i\n", callCount++, end, end-start, length, len, binaryAddress, port, file, line);
+		RAKNET_DEBUG_PRINTF("%i. SendTo_PC, time=%" PRINTF_64_BIT_MODIFIER "u, elapsed=%" PRINTF_64_BIT_MODIFIER "u, length=%i, returned=%i, binaryAddress=%i, port=%i, file=%s, line=%i\n", callCount++, end, end-start, length, len, binaryAddress, port, file, line);
 #endif
 		if (len<0)
 		{
